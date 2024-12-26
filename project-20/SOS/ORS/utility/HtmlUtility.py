@@ -30,7 +30,7 @@ class HTMLUtility:
             key = obj.get_key()
             val = obj.get_value()
 
-            if key == int(selected_val):
+            if key == str(selected_val):
                 sb.append(f"\n<option selected value='{key}'>{val}</option>")
             else:
                 sb.append(f"\n<option value='{key}'>{val}</option>")

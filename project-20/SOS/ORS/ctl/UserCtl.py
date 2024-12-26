@@ -12,7 +12,6 @@ class UserCtl(BaseCtl):
 
     def preload(self, request):
         self.page_list = RoleService().preload()
-        # self.preloadData = self.page_list
         self.form["roleId"] = request.POST.get('roleId', 0)
         self.dynamic_preload = HTMLUtility.get_list_from_objects('roleId', self.form["roleId"], self.page_list)
 
