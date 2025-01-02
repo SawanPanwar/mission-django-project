@@ -20,11 +20,19 @@ class UserCtl(BaseCtl):
             self.form["gender"] = obj.gender
             self.form["roleId"] = obj.roleId
 
-        gender_dict = {"Male": "Male", "Female": "Female"}
-        self.page_list = RoleService().preload()
+        self.static_preload = {"Male": "Male", "Female": "Female"}
+        self.dynamic_preload = RoleService().preload()
 
-        self.static_preload = HTMLUtility.get_list_from_dict('gender', self.form["gender"], gender_dict)
-        self.dynamic_preload = HTMLUtility.get_list_from_objects('roleId', self.form["roleId"], self.page_list)
+        self.form["preload"]["gender"] = HTMLUtility.get_list_from_dict(
+            'gender',
+            self.form["gender"],
+            self.static_preload
+        )
+        self.form["preload"]["role"] = HTMLUtility.get_list_from_objects(
+            'roleId',
+            self.form["roleId"],
+            self.dynamic_preload
+        )
 
     def request_to_form(self, requestForm):
         self.form["id"] = requestForm["id"]
@@ -141,18 +149,17 @@ class UserCtl(BaseCtl):
             obj = self.get_service().get(params['id'])
             self.model_to_form(obj)
 
-        res = render(request, self.get_template(),
-                     {'form': self.form, 'role_preload': self.dynamic_preload, 'gender_preload': self.static_preload})
+        res = render(request, self.get_template(), {'form': self.form})
         return res
 
     def submit(self, request, params={}):
-        if (params['id'] > 0):
-            pk = params['id']
+        if (int(self.form['id']) > 0):
+            pk = int(self.form['id'])
             dup = self.get_service().get_model().objects.exclude(id=pk).filter(loginId=self.form['loginId'])
             if dup.count() > 0:
                 self.form['error'] = True
                 self.form['message'] = "Login Id already exist"
-                res = render(request, self.get_template(), {'form': self.form, 'role_preload': self.dynamic_preload, 'gender_preload': self.static_preload})
+                res = render(request, self.get_template(), {'form': self.form})
             else:
                 r = self.form_to_model(User())
                 self.get_service().save(r)
@@ -160,13 +167,13 @@ class UserCtl(BaseCtl):
 
                 self.form['error'] = False
                 self.form['message'] = "Data updated successfully"
-                res = render(request, self.get_template(), {'form': self.form, 'role_preload': self.dynamic_preload, 'gender_preload': self.static_preload})
+                res = render(request, self.get_template(), {'form': self.form})
         else:
             duplicate = self.get_service().get_model().objects.filter(loginId=self.form['loginId'])
             if duplicate.count() > 0:
                 self.form['error'] = True
                 self.form['message'] = "Login Id already exist"
-                res = render(request, self.get_template(), {'form': self.form, 'role_preload': self.dynamic_preload, 'gender_preload': self.static_preload})
+                res = render(request, self.get_template(), {'form': self.form})
             else:
                 r = self.form_to_model(User())
                 self.get_service().save(r)
@@ -174,7 +181,7 @@ class UserCtl(BaseCtl):
 
                 self.form['error'] = False
                 self.form['message'] = "Data saved successfully"
-                res = render(request, self.get_template(), {'form': self.form, 'role_preload': self.dynamic_preload, 'gender_preload': self.static_preload})
+                res = render(request, self.get_template(), {'form': self.form})
         return res
 
     def get_template(self):
