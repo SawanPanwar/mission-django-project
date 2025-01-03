@@ -4,7 +4,7 @@ from ..service.RoleService import RoleService
 class HTMLUtility:
 
     @staticmethod
-    def get_list_from_dict(name, selected_val, data_dict):
+    def get_list_from_dict(name, selected_val='', data_dict={}):
         sb = [
             f"<select style=\"width: 170px; text-align-last: center;\" class='form-control' name='{name}'>"
         ]
@@ -19,7 +19,7 @@ class HTMLUtility:
         return "".join(sb)
 
     @staticmethod
-    def get_list_from_objects(name, selected_val, data_list):
+    def get_list_from_objects(name, selected_val=0, data_list={}):
         sb = [
             f"<select style=\"width: 170px; text-align-last: center;\" class='form-control' name='{name}'>"
         ]
